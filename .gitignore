@@ -1,0 +1,13 @@
+data/
+out/
+*.csv
+*.pkl
+*.doc*
+*.pdf
+*.csv
+*checkpoint*
+*.ppt*
+*.Rhistory
+*.npy
+*.pkl
+*.pyc
