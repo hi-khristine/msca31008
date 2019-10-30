@@ -1,8 +1,11 @@
 # Project Code for Team Elbow
 
-Data is at https://www.kaggle.com/rajeevw/ufcdata.
+**Links**
 
-Some Git tips:
+* Data https://www.kaggle.com/rajeevw/ufcdata
+* Google Drive Folder https://drive.google.com/drive/u/0/folders/1XX8-OrsI8k6OrbtRoI5fb6hqtCMIcKz4
+
+**Git Tips**
 
 * The .gitignore file shows which types of files we want to avoid tracking with Git and pushing to GitHub. This includes anything in data/ (a folder for placing data in) and out/ (a folder for placing data and other output that can be generated from code and shouldn't be tracked with Git). It also includes typically-large non-text files (they slow Git down) and jupyter checkpoints.
 
