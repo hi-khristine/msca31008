@@ -9,3 +9,5 @@ Some Git tips:
 * Git will run slow if you put data files on Github, so it is best to download data files separately instead of cloning from Git. I've added data/ to gitignore so you can place data in there and Git should ignore them.
 
 * The README is written in [markdown](https://www.markdownguide.org/cheat-sheet/).
+
+* I've created a [guide](https://docs.google.com/document/d/1mMp54zfTs7Jb1WqZa7T57_DxlxYT4Hrrw9bwhzyk_FE) to help new Git users.
