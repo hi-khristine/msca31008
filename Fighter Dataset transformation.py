@@ -1,6 +1,6 @@
 import pandas as pd
 
-data = pd.read_csv(r'C:\Users\Adam-PC\Desktop\Homework\MSCA 31008 - Data Mining\Project\ufcdata\data.csv')
+data = pd.read_csv('./data/data.csv')
 
 for i in range(len(data.columns)):
     print(data.columns[i])
@@ -42,4 +42,4 @@ fighter_dataset.sort_values(by = ['fighter', 'date'], inplace = True)
 
 import os
 os.getcwd()
-fighter_dataset.to_csv(r'C:\Users\Adam-PC\Desktop\Homework\MSCA 31008 - Data Mining\Project\fighter_level_dataset.csv')
+fighter_dataset.to_csv('./data/fighter_level_dataset.csv')
