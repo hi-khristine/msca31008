@@ -58,4 +58,4 @@ d.R_Stance.value_counts()
 # these look good.
 
 # save the data. 
-d.to_csv( '../out/data-namefix.csv' )
+d.to_csv( '../out/data-namefix.csv', index = False )
