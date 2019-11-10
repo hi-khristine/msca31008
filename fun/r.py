@@ -11,11 +11,18 @@ def which(x): return list( compress( range(len(x)), x ) )
 def stop(x): raise Exception(x)
 def grepl( pattern, x, nafalse = True ): 
     
-    val = x.str.contains( pattern )
+    val = pd.Series(x)
+    val = val.str.contains( pattern )
     if nafalse: val[ val.isnull() ] = False
     return val.tolist()
 
-def grep( pattern, x, naskip = True ): return which( grepl( pattern = pattern, x = x, nafalse = naskip ) )
+def grep( pattern, x, naskip = True, value = False ): 
+    idx = which( grepl( pattern = pattern, x = x, nafalse = naskip ) )
+    if value: 
+        return x[ idx ]
+    else:
+        return idx
+    
 def trimws(x): return strip(x)
 def setdiff( x, y ): return [ i for i in x if i not in y ]
 def table(x): return x.value_counts( ascending = False )

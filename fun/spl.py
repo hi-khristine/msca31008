@@ -12,8 +12,8 @@ def spl( x, n = 10, warn = True, replace = False ):
 
       n = min( [ n, nrow(x) ] )
       
-      return x.iloc[ sample( range(nrow(x)-1), n ) , : ].reset_index( drop = True )
+      return x.iloc[ sample( range(nrow(x)-1), n ) , : ]
 
     else:
-        return x.iloc[ choices( range( nrow(x)-1 ), n ), : ].reset_index( drop = True )
+        return x.iloc[ choices( range( nrow(x)-1 ), n ), : ]
     
