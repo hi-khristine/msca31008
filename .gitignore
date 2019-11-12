@@ -11,3 +11,4 @@ out/
 *.npy
 *.pkl
 *.pyc
+*.DS_Store
