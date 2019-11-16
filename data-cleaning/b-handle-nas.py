@@ -78,6 +78,9 @@ d.dropna( subset = [ 'Referee' ], inplace = True )
 # no NA is left:
 d.isna().sum()[ d.isna().sum() > 0 ]
 
+# add fight id.
+d['fightid'] = range(d.shape[0])
+
 d.to_csv( '../out/b-handle-nas.csv', index = False )
 
 # clean workspace to prep for the next file to run.
