@@ -131,10 +131,10 @@ na_num_dat = num_dat[na_num_cols]
 
 
 # commenting this out until we can get it running:
-#labels, centroids, X_hat = kmeans_missing(fill, n_clusters=4) #I ran this for a bunch of columns individually and saw 4 was the number of clusters in all instances
-#fighter_dataset[na_num_cols]= X_hat
+labels, centroids, X_hat = kmeans_missing( fighter_dataset[ na_num_cols ], n_clusters=4) #I ran this for a bunch of columns individually and saw 4 was the number of clusters in all instances
+fighter_dataset[na_num_cols]= X_hat
 
 save( '../out/c2-fighter-level-fillna.pkl', na_num_cols, fighter_dataset )
 
 # clean workspace to prep for the next file to run.
-del na_num_cols, fighter_dataset, na_num_dat, num_dat
+del na_num_cols, fighter_dataset, na_num_dat, num_dat, X_hat, centroids, labels
