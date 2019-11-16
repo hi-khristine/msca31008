@@ -135,3 +135,6 @@ na_num_dat = num_dat[na_num_cols]
 #fighter_dataset[na_num_cols]= X_hat
 
 save( '../out/c2-fighter-level-fillna.pkl', na_num_cols, fighter_dataset )
+
+# clean workspace to prep for the next file to run.
+del na_num_cols, fighter_dataset, na_num_dat, num_dat

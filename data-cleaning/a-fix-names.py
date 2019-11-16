@@ -59,3 +59,6 @@ d.R_Stance.value_counts()
 
 # save the data. 
 d.to_csv( '../out/a-fix-names.csv', index = False )
+
+# clean workspace to prep for the next file to run.
+del d, strings

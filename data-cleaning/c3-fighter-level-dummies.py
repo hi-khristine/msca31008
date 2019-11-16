@@ -15,3 +15,6 @@ load( '../out/c2-fighter-level-fillna.pkl' )
 fighter_dataset=pd.get_dummies(fighter_dataset, columns=['Stance'])
 
 save( '../out/c3-fighter-level-dummies.pkl', fighter_dataset, na_num_cols  )
+
+# clean workspace to prep for the next file to run.
+del fighter_dataset, na_num_cols

@@ -79,3 +79,6 @@ d.dropna( subset = [ 'Referee' ], inplace = True )
 d.isna().sum()[ d.isna().sum() > 0 ]
 
 d.to_csv( '../out/b-handle-nas.csv', index = False )
+
+# clean workspace to prep for the next file to run.
+del d, dr, f, fmets, fmetsbr, fna, nonafighters

@@ -102,8 +102,11 @@ cols=['no_of_rounds',
  #'Stance_Sideways',
  'Stance_Southpaw',
  'Stance_Switch']
-x=fighter_dataset[cols]
-(x_train, x_test, y_train, y_test) = cv.train_test_split(x, y, test_size=0.2)
+
+
+x = fighter_dataset[cols]
+from sklearn.model_selection import train_test_split
+(x_train, x_test, y_train, y_test) = train_test_split(x, y, test_size=0.2)
 SEED=1
 
 
@@ -118,3 +121,6 @@ train_dat = pca.transform(x_train)
 test_dat = pca.transform(x_test)
 
 pca.n_components_
+
+# clean workspace to prep for the next file to run.
+del cols, fighter_dataset, na_num_cols, x, y

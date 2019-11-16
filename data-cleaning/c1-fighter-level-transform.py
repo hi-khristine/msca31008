@@ -47,3 +47,8 @@ fighter_dataset = red_fighters.append(blue_fighters)
 fighter_dataset.sort_values(by = ['fighter', 'date'], inplace = True)
 
 fighter_dataset.to_csv( '../out/c1-fighter-level-transform.csv' )
+
+# clean workspace to prep for the next file to run.
+del red_fighters, blue_fighters, all_fighters, blue_history_columns, blue_opp_stats_columns, \
+    blue_stats_columns, data, fight_columns, fighter_dataset, red_fighter_columns, red_history_columns, \
+    red_opp_stats_columns, red_stats_columns, blue_fighter_columns
