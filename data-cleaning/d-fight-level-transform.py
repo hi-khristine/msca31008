@@ -4,7 +4,7 @@ import re
 import copy
 
 # Load data
-data = pd.read_csv('./data/data.csv')
+data = pd.read_csv('../data/data.csv')
 
 # Eliminate fights where one fighter has never fought before
 data["R_fights"] = data.R_wins + data.R_losses + data.R_draw
@@ -83,7 +83,7 @@ blue_fighters.columns = pd.Series(blue_fighters.columns).apply(lambda x: re.sub(
 fight_dataset = red_fighters.append(blue_fighters)
 
 ## Save dataset
-fight_dataset.to_csv('./data/fight_level_dataset_2lines.csv')
+fight_dataset.to_csv('../out/d_fight_level_dataset_2lines.csv')
 
 ## Another take: differences between the fighters
 def remove_R(cols):
@@ -103,6 +103,6 @@ for x in cols:
     
 fight_dataset['Winner'].apply(lambda x: 1 if x == 'Red' else (-1 if x == 'Blue' else 0))
 
-fight_dataset.to_csv("./data/fight_level_dataset_1line.csv")
+fight_dataset.to_csv("../out/d_fight_level_dataset_1line.csv")
 
 
