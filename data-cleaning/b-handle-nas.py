@@ -3,7 +3,7 @@
 # note: 
 #   this code should be run from the data-cleaning directory.
 #   when it runs, you'll have a corrected CSV file in the out/ folder
-#   called data-namefix-nona.csv
+#   with the same name as this file.
 
 # read in functions.
 import os
@@ -13,7 +13,7 @@ del f
 import pandas as pd
 import numpy as np
 
-d = pd.read_csv('../out/data-namefix.csv')
+d = pd.read_csv('../out/a-fix-names.csv')
 
 # for figher metrics, let's fill with the most recent prior measurement.
 
@@ -78,4 +78,4 @@ d.dropna( subset = [ 'Referee' ], inplace = True )
 # no NA is left:
 d.isna().sum()[ d.isna().sum() > 0 ]
 
-d.to_csv( '../out/data-namefix-nona.csv', index = False )
+d.to_csv( '../out/b-handle-nas.csv', index = False )

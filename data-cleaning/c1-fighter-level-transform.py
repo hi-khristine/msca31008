@@ -1,9 +1,15 @@
+# author: Bryce C working off code from Adam Z.
+# purpose: transform cleaned fight-level data to fighter-level.
+# note: 
+#   this code should be run from the data-cleaning directory.
+#   when it runs, you'll have a corrected CSV file in the out/ folder
+#   called c1-figher-level-transform.csv
+
 import pandas as pd
 
-data = pd.read_csv('./data/data.csv')
+data = pd.read_csv('../out/b-handle-nas.csv' )
 
-for i in range(len(data.columns)):
-    print(data.columns[i])
+# for i in range(len(data.columns)): print(data.columns[i])
 
 all_fighters = list(data['R_fighter'].append(data['B_fighter']).unique())
 
@@ -40,6 +46,4 @@ fighter_dataset = red_fighters.append(blue_fighters)
 
 fighter_dataset.sort_values(by = ['fighter', 'date'], inplace = True)
 
-import os
-os.getcwd()
-fighter_dataset.to_csv('./data/fighter_level_dataset.csv')
+fighter_dataset.to_csv( '../out/c1-fighter-level-transform.csv' )
