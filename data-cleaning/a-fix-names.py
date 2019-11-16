@@ -3,7 +3,7 @@
 # note: 
 #   this code should be run from the data-cleaning directory.
 #   when it runs, you'll have a corrected CSV file in the out/ folder
-#   called data-namefix.csv
+#   with the same name as this file.
 
 # read in functions.
 import os
@@ -58,4 +58,7 @@ d.R_Stance.value_counts()
 # these look good.
 
 # save the data. 
-d.to_csv( '../out/data-namefix.csv', index = False )
+d.to_csv( '../out/a-fix-names.csv', index = False )
+
+# clean workspace to prep for the next file to run.
+del d, strings
