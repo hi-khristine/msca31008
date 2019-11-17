@@ -1,18 +1,9 @@
 import pandas as pd
-import numpy as np
 import re
 import copy
 
 # Load data
-data = pd.read_csv('../data/data.csv')
-
-# Eliminate fights where one fighter has never fought before
-data["R_fights"] = data.R_wins + data.R_losses + data.R_draw
-data.drop(index = [x for x in np.where(data.R_fights == 0)[0]], inplace = True)
-data.reset_index(inplace = True, drop = True)
-data["B_fights"] = data.B_wins + data.B_losses + data.B_draw
-data.drop(index = [x for x in np.where(data.B_fights == 0)[0]], inplace = True)
-data.reset_index(inplace = True, drop = True)
+data = pd.read_csv('../out/b-handle-nas.csv')
 
 # Make column name format consistent
 cols = pd.Series(data.columns)
@@ -101,7 +92,7 @@ fight_dataset = copy.deepcopy(data[fight_columns])
 for x in cols:
     fight_dataset["Diff" + x] = data["R" + x] - data["B" + x]
     
-fight_dataset['Winner'].apply(lambda x: 1 if x == 'Red' else (-1 if x == 'Blue' else 0))
+fight_dataset['Winner'] = fight_dataset['Winner'].apply(lambda x: 1 if x == 'Red' else (-1 if x == 'Blue' else 0))
 
 fight_dataset.to_csv("../out/d_fight_level_dataset_1line.csv")
 
