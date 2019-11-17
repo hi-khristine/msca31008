@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import re
 import copy
 
@@ -7,7 +8,15 @@ data = pd.read_csv('../out/b-handle-nas.csv')
 
 # Make column name format consistent
 cols = pd.Series(data.columns)
-data.rename(columns = cols.apply(lambda x: re.sub("_ATT", "_att", x)))   
+data.rename(columns = cols.apply(lambda x: re.sub("_ATT", "_att", x)))
+
+# Function to calculate percentages, assigning zero where there are no attempts
+# or missing data
+def pct_nozero(x):
+    if np.isnan(x[0]) or np.isnan(x[1]) or x[1] == 0:
+        return 0
+    else:
+        return x[0] / x[1]
 
 # Create percentages out of landed and attempts columns
 attacks = ["BODY", "CLINCH", "DISTANCE", "GROUND", "HEAD", "LEG", "SIG_STR", "TD", "TOTAL_STR"]
@@ -19,10 +28,10 @@ R_pct_cols_opp = list()
 B_pct_cols_opp = list()
 for x in colors:
     for y in attacks:
-        data[x + "_avg_" + y + "_pct"] = data[x + "_avg_" + y + "_landed"] / \
-        data[x + "_avg_" + y + "_att"] 
-        data[x + "_avg_opp_" + y + "_pct"] = data[x + "_avg_" + y + "_landed"] / \
-        data[x + "_avg_opp_" + y + "_att"]
+        data[x + "_avg_" + y + "_pct"] = data[[x + "_avg_" + y + "_landed", 
+            x + "_avg_" + y + "_att"]].apply(lambda z: pct_nozero(z), axis = 1)
+        data[x + "_avg_opp_" + y + "_pct"] = data[[x + "_avg_" + y + "_landed",
+            x + "_avg_opp_" + y + "_att"]].apply(lambda z: pct_nozero(z), axis = 1)
         data.drop(columns = [x + "_avg_" + y + "_landed",
                              x + "_avg_" + y + "_att",
                              x + "_avg_opp_" + y + "_landed",
@@ -32,7 +41,7 @@ for x in colors:
             R_pct_cols_opp.append(x + "_avg_opp_" + y + "_pct")
         else:
             B_pct_cols_fighter.append(x + "_avg_" + y + "_pct")
-            B_pct_cols_opp.append(x + "_avg_opp_" + y + "_pct")            
+            B_pct_cols_opp.append(x + "_avg_opp_" + y + "_pct")   
         
 ## Categorize Columns
 fight_columns = ['Referee', 'date', 'location', 'Winner', 'title_bout', 'weight_class', 'no_of_rounds']
