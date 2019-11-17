@@ -32,12 +32,7 @@ del doextracttext
     
 # I checked them and only found a few corrections, which I saved here:
 
-repl = [
-        [ 'Rio de Janeiro, Rio de Janeiro, Brazil',	'Rio de Janeiro, Brazil' ],
-        ['Sao Paulo, Sao Paulo, Brazil',	'Sao Paulo, Brazil' ],
-        ['Saitama, Saitama, Japan',	'Saitama, Japan' ],
-        [ 'Berlin, Berlin, Germany',	'Berlin, Germany' ]
-]
+repl = [[ 'Berlin, Berlin, Germany',	'Berlin, Germany' ]]
 for item in repl: d.location.replace( item[0], item[1] )
 
 # confirm replacement success.
