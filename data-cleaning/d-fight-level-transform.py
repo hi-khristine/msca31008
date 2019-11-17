@@ -81,6 +81,7 @@ blue_fighters.columns = pd.Series(blue_fighters.columns).apply(lambda x: re.sub(
 blue_fighters.columns = pd.Series(blue_fighters.columns).apply(lambda x: re.sub("^R_", "Opponent_", x))
 
 fight_dataset = red_fighters.append(blue_fighters)
+fight_dataset = fight_dataset[fight_dataset.Winner != 0]
 
 ## Save dataset
 fight_dataset.to_csv('../out/d_fight_level_dataset_2lines.csv')
@@ -102,6 +103,7 @@ for x in cols:
     fight_dataset["Diff" + x] = data["R" + x] - data["B" + x]
     
 fight_dataset['Winner'] = fight_dataset['Winner'].apply(lambda x: 1 if x == 'Red' else (-1 if x == 'Blue' else 0))
+fight_dataset = fight_dataset[fight_dataset.Winner != 0]
 
 fight_dataset.to_csv("../out/d_fight_level_dataset_1line.csv")
 
