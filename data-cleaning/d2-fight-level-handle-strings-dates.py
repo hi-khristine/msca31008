@@ -43,4 +43,4 @@ dd[[ 'name', 'nvals', 'topvals', 'pareto80' ]]
 # now get dummies.
 d = pd.get_dummies(d)
 
-d.to_csv( 'd2-fight-level-handle-strings-dates.csv' )
+d.to_csv( '../out/d2-fight-level-handle-strings-dates.csv' )
