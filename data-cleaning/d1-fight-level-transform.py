@@ -107,14 +107,21 @@ for x in cols:
     
 # drop singular columns.
 fight_dataset.drop( [ x for x in fight_dataset.columns if fight_dataset[x].value_counts().shape[0] == 1 ], axis = 1, inplace = True )
-    
+
+# check NA. there are 2 na rows, drop them for now.
+fight_dataset.isna().sum()[ fight_dataset.isna().sum() > 0 ]
+fight_dataset.dropna( inplace = True )
+
 fight_dataset['Winner'] = fight_dataset['Winner'].apply(lambda x: 1 if x == 'Red' else (-1 if x == 'Blue' else 0))
 fight_dataset = fight_dataset[fight_dataset.Winner != 0]
 
 # change weight class into number since it has a direction.
 
-# Catch Weight isn't ordered and there are only a few records that have it.
-fight_dataset = fight_dataset[ fight_dataset.weight_class != "Catch Weight" ]
+# Catch/Open Weight isn't ordered and there are only a few records that have it.
+fight_dataset.weight_class.value_counts()
+fight_dataset['weight_class_catch_weight' ] = fight_dataset.weight_class == "Catch Weight"
+fight_dataset['weight_class_open_weight' ] = fight_dataset.weight_class == "Open Weight"
+#fight_dataset = fight_dataset[ ~np.isin( fight_dataset.weight_class, [ "Catch Weight", "Open Weight" ] ) ]
 
 # identify women's fights and drop this from categorization.
 fight_dataset['womens'] = fight_dataset.weight_class.str.contains('Women\'s')
@@ -122,11 +129,14 @@ fight_dataset.weight_class = fight_dataset.weight_class.str.replace('Women\'s ',
 
 # convert to ordered numeric column.
 # https://en.wikipedia.org/wiki/Mixed_martial_arts_weight_classes
-ordered_classes = [ 'Strawweight', 'Flyweight', 'Bantamweight',  'Featherweight', 'Lightweight', 'Welterweight', 'Middleweight', 'Light Heavyweight', 'Heavyweight' ]
+ordered_classes = [ "Catch Weight", "Open Weight", 'Strawweight', 'Flyweight', 'Bantamweight',  'Featherweight', 'Lightweight', 'Welterweight', 'Middleweight', 'Light Heavyweight', 'Heavyweight' ]
 fight_dataset.weight_class = [
         ordered_classes .index(x)
         for x in fight_dataset.weight_class
 ]
+# we want to differentiate open and catch weight so set them to -1.
+# We have other columns that will differentiate them (weight_class_catch_weight, weight_class_open_weight)
+fight_dataset.weight_class[ np.isin( fight_dataset.weight_class, [0, 1] ) ] = -1
 del ordered_classes 
 
 fight_dataset.to_csv("../out/d1-fight-level-transform.csv")
@@ -137,4 +147,4 @@ del fighter_columns, stats_columns, history_columns, opp_stats_columns, B_pct_co
     red_fighters, red_history_columns, red_fighter_columns, red_stats_columns, blue_opp_stats_columns, \
     red_opp_stats_columns, x, y
     
-del fight_dataset
+#del fight_dataset
