@@ -13,7 +13,7 @@ del f
 import pandas as pd
 import numpy as np
 
-d = pd.read_csv( "../out/d_fight_level_dataset_1line.csv" )
+d = pd.read_csv( "../out/d1-fight-level-transform.csv" )
 
 # convert date to parts.
 # these are months, without date so just get month and year.
@@ -44,3 +44,5 @@ dd[[ 'name', 'nvals', 'topvals', 'pareto80' ]]
 d = pd.get_dummies(d)
 
 d.to_csv( '../out/d2-fight-level-handle-strings-dates.csv' )
+
+del d, dd

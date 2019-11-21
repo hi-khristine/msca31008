@@ -17,7 +17,7 @@ y = X.Winner
 X.drop( 'Winner', axis = 1, inplace = True )
 
 # drop problematic columns.
-X.drop( ['Diff_draw', 'Unnamed: 0', 'Unnamed: 0.1' ], axis = 1, inplace = True )
+X.drop( [ 'Unnamed: 0', 'Unnamed: 0.1' ], axis = 1, inplace = True )
 
 dd = ddict(X)
 
