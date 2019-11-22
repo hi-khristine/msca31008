@@ -31,8 +31,8 @@ for i in fmets:
     )
     del i
     
-# we can fill Stance with missing.
-f.Stance.loc[ f.Stance.isna() ] = '(Missing)'
+# we can fill Stance with missing. 3/4 fighters fight with the Orthodox stance, given 'data.csv' stance column.
+f.Stance.loc[ f.Stance.isna() ] = 'Orthodox'
 
 # check NA count again. it filled in some but lots of NA still.
 f[fmets].isna().sum()
@@ -75,8 +75,8 @@ for i in fmets:
     
 # apply the same na approach as with fighters. 
 # it would be better to use f but it'd take longer.
-d.R_Stance.loc[ d.R_Stance.isna() ] = '(Missing)'
-d.B_Stance.loc[ d.B_Stance.isna() ] = '(Missing)'
+d.R_Stance.loc[ d.R_Stance.isna() ] = 'Orthodox'
+d.B_Stance.loc[ d.B_Stance.isna() ] = 'Orthodox'
 for wc in f.weight_class.unique():
     for meas in [ 'age', 'Height_cms', 'Reach_cms', 'Weight_lbs' ]:
         for color in ['B_', 'R_']:
