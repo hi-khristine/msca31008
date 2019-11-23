@@ -9,13 +9,16 @@
 # read in functions.
 import os, sys, fnmatch, traceback
 
-os.chdir( 'data-cleaning' )
+os.chdir( './data-cleaning' )
 
 for datacleanfile in fnmatch.filter( os.listdir('.'), '*.py' ): 
+    print(datacleanfile)
     try: 
-        exec( open(datacleanfile).read() )
+        #exec( open(datacleanfile).read() )
+        runfile(datacleanfile, wdir = os.getcwd())
     except:
         einfo = sys.exc_info()
         traceback.print_last( einfo )
         print( "Error at file [ " + datacleanfile + " ]." )
     del datacleanfile
+
