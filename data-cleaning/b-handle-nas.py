@@ -15,107 +15,147 @@ import numpy as np
 
 d = pd.read_csv('../out/a-fix-names.csv')
 
-# for figher metrics, let's fill with the most recent prior measurement.
+# check NAs before: 95390 NAs on 1942 rows
+print( '%s NAs on %s rows' % (
+    d.isna().sum().sum(),
+    d.isnull().any(axis=1).sum()
+))
 
-# start with original NA count. Range from 666 to 3.
-fmets = [ 'age', 'Height_cms', 'Reach_cms', 'Weight_lbs', 'Stance' ]
-fmetsbr = [ grep( '_' + i + '$', d.columns, value = True ) for i in fmets ]
-fmetsbr = [y for x in fmetsbr for y in x]
-f = pd.read_csv( '../data/fighter_level_dataset.csv' ).sort_values( by = [ 'fighter', 'date' ] )
-f[fmets].isna().sum()
-
-# attempt fill.
-for i in fmets:
-    f[ i ] = f.groupby( 'fighter' )[ i ].transform(
-        lambda s: np.nan if pd.isnull(s).all() == True else s.loc[ s.first_valid_index() ]
-    )
-    del i
+# handle fighter metrics: these shouldn't change much.
+# let's fill with the most recent prior measurement for each fighter.
+# edit: after attempting this, there aren't any NAs that can be filled this way.
+# so I've disabled it to speed up the code.
+if False:
     
-# we can fill Stance with missing. 3/4 fighters fight with the Orthodox stance, given 'data.csv' stance column.
-f.Stance.loc[ f.Stance.isna() ] = 'Orthodox'
+    # identify these measures.
+    measures = [ 'age', 'Height_cms', 'Reach_cms', 'Weight_lbs', 'Stance' ]
+    measuresbr = [ grep( '_' + i + '$', d.columns, value = True ) for i in measures ]
+    measuresbr = [y for x in measuresbr for y in x]
+    
+    # now get them for each fighter.
+    f = None
+    for color in ['R','B']:
+        cols = ['fighter'] + measures
+        fc = d[ ['fightid', 'date'] + [ color + '_' + x for x in cols  ] ]
+        fc.columns = ['fightid', 'date'] + cols
+        fc.assign( color = color, inplace = True )
+        f = pd.concat([f,fc]).reset_index(drop=True)
+        del color, fc, cols
+    
+    # start with 1532 NAs.
+    f.isna().sum().sum()
+    
+    # attempt fill.
+    f.sort_values( [ 'fighter', 'date' ], inplace = True )
+    for meas in measures:
+        f[ meas ] = f.groupby( 'fighter' )[ meas ].transform(
+            lambda s: np.nan if pd.isnull(s).all() == True else s.loc[ s.first_valid_index() ]
+        )
+        del meas
+    
+    # still 1532 NAs!
+    f.isna().sum().sum()
+    
+    # code to explore a fighter with NAs:    
+    f[ f.fighter == f.fighter[ f['Height_cms'].isna() ].values[0] ]
 
-# check NA count again. it filled in some but lots of NA still.
-f[fmets].isna().sum()
+# 95390 NAs on 1942 rows
+print( '%s NAs on %s rows' % (
+    d.isna().sum().sum(),
+    d.isnull().any(axis=1).sum()
+))
 
-# plot height by weight class. there is lots of variation.
+# 3/4 fighters fight with the Orthodox stance, given 'data.csv' stance column.
+pd.concat( [d.R_Stance, d.B_Stance ] ).value_counts( ascending = False )
+pd.concat( [d.R_Stance, d.B_Stance ] ).shape
+d.R_Stance.fillna( 'Orthodox', inplace = True )
+d.B_Stance.fillna( 'Orthodox', inplace = True )
+
+# 9 missing referee. Set to (Missing).
+d.Referee.isna().sum()
+d.Referee.fillna( '(Missing)', inplace = True )
+
+# 95074 NAs on 1789 rows
+print( '%s NAs on %s rows' % (
+    d.isna().sum().sum(),
+    d.isnull().any(axis=1).sum()
+))
+
+# can we fill in height, reach, weight by weight class?
+# plot each by weight class. there is lots of variation.
 import matplotlib.pyplot as plt
 import seaborn as sns
+
+# identify these measures.
+measures = [ 'age', 'Height_cms', 'Reach_cms', 'Weight_lbs' ]
+
+# get them for each fighter.
+f = None
+for color in ['R','B']:
+    cols = ['fighter'] + measures
+    fc = d[ [ 'fightid', 'date', 'weight_class' ] + [ color + '_' + x for x in cols  ] ].reset_index(drop=True)
+    fc.columns = [ 'fightid', 'date', 'weight_class'] + cols
+    fc['color'] = color
+    f = pd.concat([f,fc]).reset_index(drop=True)
+    del color, fc, cols
+    
 sns.boxplot( x = f.Height_cms, y = f.weight_class )
 sns.boxplot( x = f.Reach_cms, y = f.weight_class )
 sns.boxplot( x = f.Weight_lbs, y = f.weight_class )
+sns.boxplot( x = f.age, y = f.weight_class )
 
 # there is a lot of overlap, but let's attempt to fill NAs physical measurement with the mean
 # and see how that plays out.
-for wc in f.weight_class.unique():
-    for meas in [ 'age', 'Height_cms', 'Reach_cms', 'Weight_lbs' ]:
-        f[meas][ f[meas].isna() & ( f.weight_class == wc ) ] = f[meas][ ~f[meas].isna() & ( f.weight_class == wc ) ].mean()
+for wc in d.weight_class.unique():
+    for meas in measures:
+        f[meas].loc[ f[meas].isna() & ( f.weight_class == wc ) ] = f[meas][ ~f[meas].isna() & ( f.weight_class == wc ) ].mean()
         del meas
     del wc
     
-# check NA count again. there are no nas in the fighter data now.
-f[fmets].isna().sum()
+# confirm no NA.
+f[measures].isna().sum()
 
-# explore NA data.
-# fna = f[ np.isin( f.fighter, f.fighter[ f.age.isna() ] ) ][ [ 'fighter', 'date' ] + fmets ]
+# join this back to d. 
+# note shape to make sure it doesn't change.
+# (5144, 146)
+d.shape
 
-# 35% of fighters have missing physical measurements.
-# this is a large percentage but these will be difficult to address so let's drop them for now.
-#nonafighters = f[fmets+['fighter']].dropna().fighter
-#( f.fighter.nunique() - nonafighters.nunique() ) / f.fighter.nunique()
-#d = d[ np.isin( d.R_fighter, nonafighters ) & np.isin( d.B_fighter, nonafighters ) ].reset_index( drop = True )
-
-# attempt fill with first valid. 
-for i in fmets:
-    for br in [ 'B_', 'R_' ]:
-        d[ br + i ] = d.groupby( br + 'fighter' )[ br + i ].transform(
-            lambda s: np.nan if pd.isnull(s).all() == True else s.loc[ s.first_valid_index() ]
-        )
-        del br
-    del i
+for color in ['R', 'B']:
+    colormeas =  [ color + '_' + x for x in measures ]
+    d.drop( colormeas, axis = 1, inplace = True )
+    fc = f[ f.color == color ][ [ 'fighter', 'fightid' ] + measures ]
+    fc.columns = [ color + '_fighter', 'fightid' ] + colormeas
+    d = pd.merge( d, fc, how = 'left', on = [ color + '_fighter', 'fightid' ] )
+    del color, colormeas, fc
     
-# apply the same na approach as with fighters. 
-# it would be better to use f but it'd take longer.
-d.R_Stance.loc[ d.R_Stance.isna() ] = 'Orthodox'
-d.B_Stance.loc[ d.B_Stance.isna() ] = 'Orthodox'
-for wc in f.weight_class.unique():
-    for meas in [ 'age', 'Height_cms', 'Reach_cms', 'Weight_lbs' ]:
-        for color in ['B_', 'R_']:
-            meas2 = color + meas
-            d[meas2][ d[meas2].isna() & ( d.weight_class == wc ) ] = d[meas2][ ~d[meas2].isna() & ( d.weight_class == wc ) ].mean()
-            del color, meas2
-        del meas
-    del wc
+# (5144, 146)
+d.shape
 
-# I am guessing NAs come from fights being first fights where no history exists.
-d.sort_values( by = [ 'date' ], inplace = True )
+# 93835 NAs on 1496 rows
+print( 'Raw data has %s NAs on %s rows' % (
+    d.isna().sum().sum(),
+    d.isnull().any(axis=1).sum()
+))
 
-# let's look at red: 49 columns have NAs.
-dr = d[ grep( '^R_', d.columns, value = True ) ]
-dr.isna().sum()[ dr.isna().sum() > 0 ]
-sum( dr.isna().sum() > 0 )
+# drop first fights.
+d = d[ 
+      # no NAs in the row OR
+      ~d.isnull().any(axis=1) | 
+      # is not a first fight.
+      ( d.R_fighter.duplicated() & d.B_fighter.duplicated() ) 
+].reset_index( drop = True )
 
-# now drop the first fights. 52 still have NAs but the counts did go down.
-# based on this I suggest we exclude first-fights from our data.
-# these can be modeled separately if we have time.
-# takes from ## to ## rows
-dr = dr[ dr.R_fighter.duplicated() ]
-dr.isna().sum()[ dr.isna().sum() > 0 ]
+# 44051 NAs on 720 rows
+print( 'Raw data has %s NAs on %s rows' % (
+    d.isna().sum().sum(),
+    d.isnull().any(axis=1).sum()
+))
 
-# drop first fights. this reduces data from over ## to ## rows.
-d = d[ ~d.isnull().any(axis=1) | ( d.R_fighter.duplicated() & d.B_fighter.duplicated() ) ].reset_index( drop = True )
-d.isna().sum()[ d.isna().sum() > 0 ]
-
-# this leaves only 6 rows with NA referree. Let
-# Drop these rows, going from 2356 rows to 2350.
-d.dropna( subset = [ 'Referee' ], inplace = True )
-
-# no NA is left:
-d.isna().sum()[ d.isna().sum() > 0 ]
-
-# add fight id.
-d['fightid'] = range(d.shape[0])
+# remaining NAs are fight metrics. 
+# leave them in for now, we'll use kmeans to fill them in once everything is standardized/normalized.
+nacols = d.columns[ d.isna().sum() > 0 ]
 
 d.to_csv( '../out/b-handle-nas.csv', index = False )
 
 # clean workspace to prep for the next file to run.
-del d, dr, f, fmets, fmetsbr, fna, nonafighters
+del d, f, measures
