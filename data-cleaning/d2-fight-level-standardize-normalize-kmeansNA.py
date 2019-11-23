@@ -10,28 +10,32 @@ import os
 for f in os.listdir('../fun/'): exec(open('../fun/'+f).read())
 del f
 
-X = pd.read_csv( '../out/d2-fight-level-handle-strings-dates.csv'  )
+X = pd.read_csv( '../out/d1-fight-level-handle-strings-dates.csv' )
 
 # extract the Winner column.
 y = X.Winner
 X.drop( 'Winner', axis = 1, inplace = True )
 
-# drop problematic columns.
-X.drop( [ 'Unnamed: 0', 'Unnamed: 0.1' ], axis = 1, inplace = True )
-
-dd = ddict(X)
-
-X.isna().sum()[ X.isna().sum() > 0 ]
+# drop id column.
+X.drop( [ 'fightid' ], axis = 1, inplace = True )
 
 # standardize.
 from sklearn.preprocessing import StandardScaler
 cols = X.columns
 X = StandardScaler().fit_transform(X)
 
+# Normalizer won't work with NAs, so this is a good time to fill them in.
+#labels, centroids, X = kmeans_missing( X, n_clusters = 20, max_iter = 10 )
+X = pd.DataFrame(X)
+nas = X.isnull().any( axis = 1 )
+X = X[ ~nas ]
+y = y[ ~nas ]
+del nas
+
 # normalize.
 from sklearn.preprocessing import Normalizer
 X = Normalizer().fit_transform(X)
 
-save( '../out/d3-fight-level-standardize-normalize.pkl', X, y, cols )
+save( '../out/d2-fight-level-standardize-normalize-kmeansNA.pkl', X, y, cols )
 
-del dd, X, y, cols
+del X, y, cols#, labels, centroids
