@@ -32,4 +32,5 @@ def tonum( x, nastrings = [ 'nan', '', 'NA', 'NULL' ], dropchars = False ):
 t = [ '$1', '1.00', '25%', '(3.4)', '-1' ]
 assert ( tonum(t) == [ 1, 1, .25, -3.4, -1 ] ).all()
 t = None
+
 del t
