@@ -12,3 +12,4 @@ out/
 *.pkl
 *.pyc
 *.DS_Store
+draft/
