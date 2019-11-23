@@ -17,8 +17,8 @@ for datacleanfile in fnmatch.filter( os.listdir('.'), '*.py' ):
         #exec( open(datacleanfile).read() )
         runfile(datacleanfile, wdir = os.getcwd())
     except:
-        einfo = sys.exc_info()
-        traceback.print_last( einfo )
-        print( "Error at file [ " + datacleanfile + " ]." )
+        #einfo = sys.exc_info()
+        #traceback.print_last( einfo )
+        raise Exception( "Error at file [ " + datacleanfile + " ]." )
     del datacleanfile
 

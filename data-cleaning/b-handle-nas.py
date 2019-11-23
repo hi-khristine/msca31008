@@ -120,14 +120,16 @@ f[measures].isna().sum()
 # (5144, 146)
 d.shape
 
-for color in ['R', 'B']:
-    colormeas =  [ color + '_' + x for x in measures ]
-    d.drop( colormeas, axis = 1, inplace = True )
-    fc = f[ f.color == color ][ [ 'fighter', 'fightid' ] + measures ]
-    fc.columns = [ color + '_fighter', 'fightid' ] + colormeas
-    d = pd.merge( d, fc, how = 'left', on = [ color + '_fighter', 'fightid' ] )
-    del color, colormeas, fc
-    
+fillbyclass = True
+if fillbyclass: 
+    for color in ['R', 'B']:
+        colormeas =  [ color + '_' + x for x in measures ]
+        d.drop( colormeas, axis = 1, inplace = True )
+        fc = f[ f.color == color ][ [ 'fighter', 'fightid' ] + measures ]
+        fc.columns = [ color + '_fighter', 'fightid' ] + colormeas
+        d = pd.merge( d, fc, how = 'left', on = [ color + '_fighter', 'fightid' ] )
+        del color, colormeas, fc
+        
 # (5144, 146)
 d.shape
 

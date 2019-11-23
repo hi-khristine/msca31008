@@ -25,12 +25,19 @@ cols = X.columns
 X = StandardScaler().fit_transform(X)
 
 # Normalizer won't work with NAs, so this is a good time to fill them in.
-#labels, centroids, X = kmeans_missing( X, n_clusters = 20, max_iter = 10 )
-X = pd.DataFrame(X)
-nas = X.isnull().any( axis = 1 )
-X = X[ ~nas ]
-y = y[ ~nas ]
-del nas
+kmeansfillna = True
+if kmeansfillna:
+    
+    labels, centroids, X = kmeans_missing( X, n_clusters = 20, max_iter = 10 )
+    del labels, centroids
+    
+else: 
+    
+    X = pd.DataFrame(X)
+    nas = X.isnull().any( axis = 1 )
+    X = X[ ~nas ]
+    y = y[ ~nas ]
+    del nas
 
 # normalize.
 from sklearn.preprocessing import Normalizer
