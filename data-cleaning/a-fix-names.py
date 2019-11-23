@@ -15,6 +15,9 @@ import numpy as np
 
 d = pd.read_csv('../data/data.csv')
 
+# add fight id early on.
+d['fightid'] = range(d.shape[0])
+
 # I extract the text values and check them for typos using OpenRefine faceting.
 doextracttext = False
 if doextracttext:
