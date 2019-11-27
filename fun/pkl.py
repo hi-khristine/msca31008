@@ -1,19 +1,19 @@
 from inspect import stack
-from re import search, sub
+import re
 import pickle
 
 def save( path, *argv ):
     
     # get arg names from the function call.
-    names = search( '\(([^)]+)\)', stack()[1].code_context[0] ).group(1)
+    names = re.search( '\(([^)]+)\)', stack()[1].code_context[0] ).group(1)
     
     # was the path name used? if so, remove it.
-    if search( 'path *=', names ): 
+    if re.search( 'path *=', names ): 
         names = names.replace( 'path *=', '' )
         
     # otherwise, path is the first argument. remove it.
     else: 
-        names = sub( '^[^,]+,', '', names )
+        names = re.sub( '^[^,]+,', '', names )
     
     # then split by comma and remove blanks.    
     names = [ i for i in [ i.strip() for i in names.split(',') ] if i != '' ]

@@ -18,6 +18,13 @@ d = pd.read_csv('../data/data.csv')
 # add fight id early on.
 d['fightid'] = range(d.shape[0])
 
+# add odds.
+load( '../scrape-odds/get-fight-odds.pkl' )
+d.date = pd.to_datetime(d.date)
+d = pd. merge( d, f[[ 'fightid', 'R_odds', 'B_odds' ]], how = 'left', on = 'fightid' )
+d.R_odds = tonum(d.R_odds)
+d.B_odds = tonum(d.B_odds)
+
 # I extract the text values and check them for typos using OpenRefine faceting.
 doextracttext = False
 if doextracttext:

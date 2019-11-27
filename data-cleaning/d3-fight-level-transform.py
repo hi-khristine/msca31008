@@ -54,7 +54,7 @@ for x in colors:
             B_pct_cols_opp.append(x + "_avg_opp_" + y + "_pct")
 
 red_fighter_columns = ['R_age', 'R_Height_cms', 'R_Reach_cms', 'R_Weight_lbs']
-red_stats_columns = ['R_avg_KD', 'R_avg_PASS', 'R_avg_REV', 'R_avg_SUB_ATT', 'R_avg_opp_SUB_ATT' ] + R_pct_cols_fighter
+red_stats_columns = ['R_avg_KD', 'R_avg_PASS', 'R_avg_REV', 'R_avg_SUB_ATT', 'R_avg_opp_SUB_ATT', 'R_odds' ] + R_pct_cols_fighter
 red_history_columns = ['R_current_lose_streak', 'R_current_win_streak', 'R_draw', 'R_longest_win_streak', 
                        'R_losses', 'R_total_rounds_fought', 'R_total_time_fought(seconds)', 'R_total_title_bouts', 
                        'R_win_by_Decision_Majority', 'R_win_by_Decision_Split', 'R_win_by_Decision_Unanimous', 
@@ -63,7 +63,7 @@ red_opp_stats_columns = ['R_avg_opp_KD', 'R_avg_opp_PASS', 'R_avg_opp_REV'] +R_p
 
 
 blue_fighter_columns = ['B_age', 'B_Height_cms', 'B_Reach_cms', 'B_Weight_lbs', 'B_avg_SUB_ATT', 'B_avg_opp_SUB_ATT' ]
-blue_stats_columns = ['B_avg_KD', 'B_avg_PASS', 'B_avg_REV'] + B_pct_cols_fighter
+blue_stats_columns = ['B_avg_KD', 'B_avg_PASS', 'B_avg_REV', 'B_odds'] + B_pct_cols_fighter
 blue_history_columns= ['B_current_lose_streak', 'B_current_win_streak', 'B_draw', 'B_longest_win_streak', 
                        'B_losses', 'B_total_rounds_fought', 'B_total_time_fought(seconds)', 'B_total_title_bouts', 
                        'B_win_by_Decision_Majority', 'B_win_by_Decision_Split', 'B_win_by_Decision_Unanimous', 
