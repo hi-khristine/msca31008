@@ -243,14 +243,14 @@ svclassifier_gaus_optim.fit(X_train, y_train)
 # In[38]:
 
 
-# view optimized results/accuracy on testing data
+# view optimized results/accuracy on training data
 print(classification_report(y_train,svclassifier_gaus_optim.predict(X_train)))
 
 
 # In[39]:
 
 
-# check accuracy against test data
+# view optimized results/accuracy on testing data
 print(classification_report(y_test, svclassifier_gaus_optim.predict(X_test)))
 
 
