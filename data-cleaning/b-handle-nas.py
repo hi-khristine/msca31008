@@ -120,8 +120,8 @@ f[measures].isna().sum()
 # (5144, 146)
 d.shape
 
-fillbyclass = True
-if fillbyclass: 
+# fill measures by weight class:
+if ( 'iterationnum' not in globals() ) or ( iterationnum >= 1 ): 
     for color in ['R', 'B']:
         colormeas =  [ color + '_' + x for x in measures ]
         d.drop( colormeas, axis = 1, inplace = True )

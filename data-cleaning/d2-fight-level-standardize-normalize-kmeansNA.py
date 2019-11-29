@@ -25,12 +25,14 @@ cols = X.columns
 X = StandardScaler().fit_transform(X)
 
 # Normalizer won't work with NAs, so this is a good time to fill them in.
-kmeansfillna = True
-if kmeansfillna:
+
+# if this is after iteration 0, use kmeans clustering to fill them.
+if ( 'iterationnum' not in globals() ) or (iterationnum >= 1 ):
     
     labels, centroids, X = kmeans_missing( X, n_clusters = 20, max_iter = 10 )
     del labels, centroids
-    
+
+# if not, drop them.    
 else: 
     
     X = pd.DataFrame(X)
