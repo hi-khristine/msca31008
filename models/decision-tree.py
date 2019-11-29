@@ -4,8 +4,7 @@ for f in os.listdir('../fun/'): exec(open('../fun/'+f).read())
 del f
 
 # Load data. Change winner to binary 1/0:
-load( '../out/d3-fight-level-standardize-normalize.pkl' )
-y[ y == -1 ] = 0
+load( '../out/d3-fight-level-transform.pkl' )
 
 # train test split.
 from sklearn.model_selection import train_test_split
@@ -17,7 +16,11 @@ X_train , X_test, y_train, y_test = train_test_split(
 
 # Fit decision tree.
 from sklearn.tree import DecisionTreeClassifier
-m = DecisionTreeClassifier( max_depth = 14, min_samples_split = .05, random_state = 716 )
+m = DecisionTreeClassifier( 
+    max_depth = 14, 
+    min_samples_split = .03, 
+    random_state = 716 
+)
 m.fit( X_train, y_train )
 
 # accuracy against train data (in-model).

@@ -17,9 +17,11 @@ X_train , X_test, y_train, y_test = train_test_split(
 # Fit decision tree.
 from sklearn.ensemble import RandomForestClassifier
 m = RandomForestClassifier( 
-    n_estimators = 200, 
-    min_samples_leaf = .1, 
-    random_state = 841 
+    n_estimators = 400, 
+    max_depth = 15,
+    min_samples_leaf = .01, 
+    n_jobs = -1,
+    random_state = 841
 )
 m.fit( X_train, y_train )
 
