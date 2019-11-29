@@ -13,3 +13,4 @@ out/
 *.pyc
 *.DS_Store
 draft/
+*.pbix

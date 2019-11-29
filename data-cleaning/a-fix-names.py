@@ -19,27 +19,28 @@ d = pd.read_csv('../data/data.csv')
 d['fightid'] = range(d.shape[0])
 d.date = pd.to_datetime(d.date)
 
-# add odds.
+# add web-scraped items: odds, referrees.
 if ( 'iterationnum' not in globals() ) or (iterationnum >= 2 ):
+
     load( '../scrape-odds/get-fight-odds.pkl' )
     d = pd. merge( d, f[[ 'fightid', 'R_odds', 'B_odds' ]], how = 'left', on = 'fightid' )
     d.R_odds = tonum(d.R_odds)
     d.B_odds = tonum(d.B_odds)
 
-# fill missing referrees.
-# 23 missing referees.
-d.Referee.isna().sum()
-mr = pd.read_csv( '../data/Missing_Referees_Scraped.csv' )
-mr.date = pd.to_datetime( mr.date )
-for index, row in mr.iterrows():
-    d.loc[
-        ( d.R_fighter == row.R_fighter ) & ( d.B_fighter == row.B_fighter ) & ( d.date == row.date),
-        d.columns == 'Referee'
-    ] = row.Referee
-    del index, row
-# 1 missing referee.
-d.Referee.isna().sum()
-del mr
+    # fill missing referrees.
+    # 23 missing referees.
+    d.Referee.isna().sum()
+    mr = pd.read_csv( '../data/Missing_Referees_Scraped.csv' )
+    mr.date = pd.to_datetime( mr.date )
+    for index, row in mr.iterrows():
+        d.loc[
+            ( d.R_fighter == row.R_fighter ) & ( d.B_fighter == row.B_fighter ) & ( d.date == row.date),
+            d.columns == 'Referee'
+        ] = row.Referee
+        del index, row
+    # 1 missing referee.
+    d.Referee.isna().sum()
+    del mr
 
 # I extract the text values and check them for typos using OpenRefine faceting.
 doextracttext = False
