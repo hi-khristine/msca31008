@@ -7,32 +7,36 @@
 # this file errors out and I'm not sure why.
 
 # read in functions.
-import os, sys, fnmatch, traceback, re
+import os, sys, fnmatch, traceback, re, random
 
 os.chdir( 'data-cleaning' )
 
 # run each iteration.
 allscores = None
 kfold_splits = 10
-for iterationnum in [0,1,2]:
+for iterationnum in [0,1,2,3]:
     
-    iteration = [ 'A: Base Model', 'B: Fill NAs by KMeans, Class', 'C: Add Odds' ][iterationnum]
+    # start with same random seed for each iteration.
+    random.seed( 141 )
+    
+    iteration = [ 'A: Base Model', 'B: Fill NAs by KMeans, Weight Class', 'C: Add Odds', 'D: Grid Seach Param. Tuning' ][iterationnum]
     
     # run data cleaning at selected level.
-    for datacleanfile in fnmatch.filter( os.listdir('.'), '*.py' ): 
+    if iterationnum < 3: 
+        for datacleanfile in fnmatch.filter( os.listdir('.'), '*.py' ): 
         
-        # skip fighter-level, we aren't modeling it.
-        if re.search( 'fighter-level', datacleanfile ):
-            continue
-        
-        print(datacleanfile)
-        try: 
-            runfile(datacleanfile, wdir = os.getcwd())
-        except:
-            #einfo = sys.exc_info()
-            #traceback.print_last( einfo )
-            raise Exception( "Error at file [ " + datacleanfile + " ]." )
-        del datacleanfile
+            # skip fighter-level, we aren't modeling it.
+            if re.search( 'fighter-level', datacleanfile ):
+                continue
+            
+            print(datacleanfile)
+            try: 
+                runfile(datacleanfile, wdir = os.getcwd())
+            except:
+                #einfo = sys.exc_info()
+                #traceback.print_last( einfo )
+                raise Exception( "Error at file [ " + datacleanfile + " ]." )
+            del datacleanfile
     
     load( '../out/d3-fight-level-transform.pkl' )
     X = pd.DataFrame(X) 
@@ -46,35 +50,53 @@ for iterationnum in [0,1,2]:
     from sklearn.model_selection import train_test_split
     X_train , X_test, y_train, y_test = train_test_split(
         X, y, 
-        random_state = 718,
         test_size = 0.25
     )
     
     # run models.
-    import random
     from sklearn.ensemble import AdaBoostClassifier, RandomForestClassifier
     from sklearn.tree import DecisionTreeClassifier
     from sklearn.svm import SVC
     from sklearn.linear_model import LogisticRegression
+    from sklearn.ensemble import VotingClassifier
     from sklearn.metrics import confusion_matrix, classification_report, f1_score, precision_score, recall_score
     from sklearn.model_selection import KFold
     
-    random.seed( 141 )
+    # load tuned parameters. run the applicable .py script in models/ to get these.
+    if iterationnum >= 3:
+        
+        load( '../out/grid-randomforest.pkl' )
+        load( '../out/grid-adaboost.pkl' )
+        load( '../out/grid-decisiontree.pkl' )
+        
+        models = [
+            ('Logistic Regression', LogisticRegression( solver = 'lbfgs', n_jobs = -1 )),
+            ('ADA Booster', grid_adaboost.best_estimator_ ),
+            ('Decision Tree', grid_decisiontree.best_estimator_ ),
+            ('Random Forest', grid_randomforest.best_estimator_ ),
+            ('SVM Linear', SVC( kernel='linear' )),
+            ('SVM Gaussian-RBF', SVC( kernel='rbf' )) 
+        ]
+        
+    else:        
     
-    models = {
-        'Logistic Regression': LogisticRegression( solver = 'lbfgs', n_jobs = -1 ),
-        'ADA Booster': AdaBoostClassifier(),
-        'Decision Tree': DecisionTreeClassifier( 
-            max_depth = 20, 
-            min_samples_split = .03
-        ),
-        'Random Forest': RandomForestClassifier( 
-            n_estimators = 200, 
-            min_samples_leaf = .1,
-            n_jobs = -1
-        ),
-        'SVM Linear': SVC( kernel='linear' )
-    }
+        models = [
+            ('Logistic Regression', LogisticRegression( solver = 'lbfgs', n_jobs = -1 )),
+            ('ADA Booster', AdaBoostClassifier()),
+            ('Decision Tree', DecisionTreeClassifier( 
+                max_depth = 20, 
+                min_samples_split = .03
+            )),
+            ('Random Forest', RandomForestClassifier( 
+                n_estimators = 200, 
+                min_samples_leaf = .1,
+                n_jobs = -1
+            )),
+            ('SVM Linear', SVC( kernel='linear' )),
+            ('SVM Gaussian-RBF', SVC( kernel='rbf' )) 
+        ]
+    
+    models.append( ('Voting Classifier', VotingClassifier(models[0:5]) ) )
     
     # identify columns we'll drop for log regression: 
     # find highly correlated pairs.
@@ -98,7 +120,7 @@ for iterationnum in [0,1,2]:
         del row
     del hicor, c
     
-    for modelname, model in models.items():
+    for modelname, model in models:
         
         print( 'Running: ' + modelname + ' / ' + iteration )
         

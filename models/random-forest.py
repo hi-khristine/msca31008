@@ -14,15 +14,36 @@ X_train , X_test, y_train, y_test = train_test_split(
     test_size = 0.25
 )
 
-# Fit decision tree.
+# run grid search on parameters.    
 from sklearn.ensemble import RandomForestClassifier
-m = RandomForestClassifier( 
-    n_estimators = 400, 
-    max_depth = 15,
-    min_samples_leaf = .01, 
-    n_jobs = -1,
-    random_state = 841
-)
+from sklearn.model_selection import GridSearchCV
+m = RandomForestClassifier()
+readpriorgrid = False
+if ( not readpriorgrid  )  or ( 'grid-randomforest.pkl' not in os.listdir('../out/') ):
+    grid_randomforest = GridSearchCV(
+        m, cv = 6, scoring = 'precision', n_jobs = -1, verbose = True,
+        param_grid = dict(
+            max_depth = range( 8, 16, 1 ),
+            min_samples_leaf = [ x/100 for x in range( 1, 10, 1 ) ],
+            n_estimators = range( 1, 11, 1),
+        )
+    )
+    grid_randomforest.fit( X_train, y_train )
+    save( '../out/grid-randomforest.pkl', grid_randomforest )
+else:
+    load( '../out/grid-randomforest.pkl' )
+print(grid_randomforest.best_params_)
+print(grid_randomforest.best_score_)
+m = grid_randomforest.best_estimator_
+
+#from sklearn.manifold import TSNE
+#import matplotlib.pyplot as plt
+#t = TSNE( learning_rate = 100 ).fit_transform(grid)
+#plt.figure(1,figsize=(20,20),dpi=72)
+#plt.scatter( x = t[:,0], y = t[:,1], c = grid.score )
+#plt.show()
+
+# Fit decision tree.
 m.fit( X_train, y_train )
 
 # accuracy against train data (in-model).
