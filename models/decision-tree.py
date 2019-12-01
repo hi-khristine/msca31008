@@ -6,11 +6,13 @@ del f
 # Load data. Change winner to binary 1/0:
 load( '../out/d3-fight-level-transform.pkl' )
 
+import random
+random.seed( 115 )
+
 # train test split.
 from sklearn.model_selection import train_test_split
 X_train , X_test, y_train, y_test = train_test_split(
     X, y, 
-    random_state = 718,
     test_size = 0.25
 )
 

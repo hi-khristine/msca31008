@@ -74,8 +74,7 @@ for iterationnum in [0,1,2,3]:
             ('ADA Booster', grid_adaboost.best_estimator_ ),
             ('Decision Tree', grid_decisiontree.best_estimator_ ),
             ('Random Forest', grid_randomforest.best_estimator_ ),
-            ('SVM Linear', SVC( kernel='linear' )),
-            ('SVM Gaussian-RBF', SVC( kernel='rbf' )) 
+            ('SVC', grid_svc.best_estimator_ )
         ]
         
     else:        
@@ -92,11 +91,11 @@ for iterationnum in [0,1,2,3]:
                 min_samples_leaf = .1,
                 n_jobs = -1
             )),
-            ('SVM Linear', SVC( kernel='linear' )),
-            ('SVM Gaussian-RBF', SVC( kernel='rbf' )) 
+            ('SVC', SVC( kernel='linear' ))
         ]
     
-    models.append( ('Voting Classifier', VotingClassifier(models[0:5]) ) )
+    # svc causes an error in voting classifier, so only use the first 4 models.
+    models.append( ('Voting Classifier', VotingClassifier(models[0:3]) ) )
     
     # identify columns we'll drop for log regression: 
     # find highly correlated pairs.
