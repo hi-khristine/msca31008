@@ -1,19 +1,20 @@
 import os
-for f in os.listdir('../fun/'): exec(open('../fun/'+f).read())
+for f in os.listdir('./fun/'): exec(open('./fun/'+f).read())
 del f
 
 import pandas as pd
 import numpy as np
 import math
 import datetime
-#from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
-#import matplotlib.pyplot as plt
 import seaborn as sns
 
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
+
 # Load data
-data = pd.read_csv("../out/d_fight_level_dataset_1line.csv", index_col = 0)
+data = pd.read_csv("./out/d_fight_level_dataset_1line.csv", index_col = 0)
 
 # Change winner to binary 1/0:
 data.Winner = data.Winner.apply(lambda x: np.where(x == -1, 0, 1))
