@@ -15,6 +15,7 @@ register_matplotlib_converters()
 
 # Load data
 data = pd.read_csv("./out/d_fight_level_dataset_1line.csv", index_col = 0)
+data.reset_index(inplace = True)
 
 # Change winner to binary 1/0:
 data.Winner = data.Winner.apply(lambda x: np.where(x == -1, 0, 1))
@@ -38,6 +39,11 @@ features.drop(index = ["Diff_win_by_Decision_Majority",
 
 # Diff_draw is mostly NA/0
 features.drop(index = "Diff_draw", inplace = True)
+
+# Delete two rows with missing data
+delete = np.where(data[features].apply(lambda x: np.sum(np.isnan(x)) != 0, axis = 1))
+delete = [x for x in delete for x in x]
+data.drop(index = delete, inplace = True)
 
 # Standardize columns
 scaler = StandardScaler(copy = False)
@@ -106,8 +112,8 @@ for x in range(split, len(dates)):
     result = pd.DataFrame(data = {"date" : data.iloc[fights].date,
                                   "prediction" : m.predict(X_test),
                                   "actual" : y_test})
-    result["action"] = result.apply(lambda x: np.where(x.prediction < .6, "Bet Loss",
-          np.where(x.prediction > .7, "Bet Win", "No Action")), axis = 1)
+    result["action"] = result.apply(lambda x: np.where(x.prediction < .55, "Bet Loss",
+          np.where(x.prediction > .65, "Bet Win", "No Action")), axis = 1)
     result["result"] = result.apply(determine_result, axis = 1)
     result["wager_result"] = result.apply(lambda x: np.where(x.result == "Won", 100,
     np.where(x.result == "Lost", -100, 0)), axis = 1)
