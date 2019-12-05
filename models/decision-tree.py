@@ -21,14 +21,17 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import GridSearchCV
 m = DecisionTreeClassifier()
 readpriorgrid = False
-if ( not readpriorgrid  )  or ( 'grid-randomforest.pkl' not in os.listdir('../out/') ):
+if ( not readpriorgrid  )  or ( 'grid-decisiontree.pkl' not in os.listdir('../out/') ):
     grid_decisiontree = GridSearchCV(
-        m, cv = 8, scoring = 'precision', n_jobs = -1, verbose = True,
+        m, cv = 8, scoring = 'accuracy', n_jobs = -1, verbose = True,
         param_grid = dict(
+            # wide ranges:
+            #min_impurity_decrease = [ x/1000 for x in list( range( 1, 10, 1 ) ) ]
+            #max_features = range( 10, 25, 2 ),
             min_samples_split = range( 25, 35, 5 ),
-            max_depth = range( 15, 20 ),
-            max_features = range( 10, X.shape[1], 10 ),
-            min_impurity_decrease = [ x/100 for x in list( range( 0, 100, 15 ) ) ]
+            max_depth = range( 5, 15),
+            max_features = range( 10, 25, 2 ),
+            min_impurity_decrease = [ x/1000 for x in list( range( 1, 5, 1 ) ) ]
         )
     )
     grid_decisiontree.fit( X_train, y_train )

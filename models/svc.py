@@ -23,29 +23,33 @@ m = SVC()
 readpriorgrid = False
 if ( not readpriorgrid  )  or ( 'grid-svc.pkl' not in os.listdir('../out/') ):
     grid_svc = GridSearchCV(
-        m, cv = 6, scoring = 'precision', n_jobs = -1, verbose = True,# error_score = 0.0,
+        m, cv = 6, scoring = 'accuracy', n_jobs = -1, verbose = True,# error_score = 0.0,
         param_grid = dict(
             # these are for searching a wide range of values:
-            C = [x/100 for x in range( 100, 150, 5 ) ],
+            #C = [x/100 for x in range( 0, 125, 5 ) ],
             #kernel = [ 
             #    'linear', 'poly', 'rbf', 'sigmoid'
             #     precomputed results in error:  should be a square kernel matrix
             #    , 'precomputed' 
             #],
-            #degree = range( 1, 3 ),
+            #degree = range( 1, 5 ),
             #gamma = [ 'scale', 'auto' ],
-            #coef0 = [x/100 for x in range( 0, 100 ) ],
+            #coef0 = [x/100 for x in range( 0, 100, 10 ) ],
             #shrinking = [ True, False ],
             #probability  = [ True, False ],
             #decision_function_shape = [ 'ovo', 'ovr' ],
             
             # these are narrowed down to the best.
+            C = [x/100 for x in range( 100, 125, 5 ) ],
+            coef0 = [x/100 for x in range( 0, 15, 1 ) ],
+            degree = range( 1, 3 ),
+            
             decision_function_shape  = ['ovo'],
             kernel = ['sigmoid'],
             probability = [True],
-            shrinking = [False],
+            shrinking = [True],
             gamma = ['scale'],
-            degree = [1],            
+            #degree = [1],   
         )
     )
     grid_svc.fit( X_train, y_train )

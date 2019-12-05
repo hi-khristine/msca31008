@@ -21,11 +21,14 @@ m = RandomForestClassifier()
 readpriorgrid = False
 if ( not readpriorgrid  )  or ( 'grid-randomforest.pkl' not in os.listdir('../out/') ):
     grid_randomforest = GridSearchCV(
-        m, cv = 6, scoring = 'precision', n_jobs = -1, verbose = True,
+        m, cv = 8, scoring = 'accuracy', n_jobs = -1, verbose = True,
         param_grid = dict(
-            max_depth = range( 8, 16, 1 ),
-            min_samples_leaf = [ x/100 for x in range( 1, 10, 1 ) ],
-            n_estimators = range( 1, 11, 1),
+            # wide range options:
+            #max_depth = range( 4, 20, 1 ),
+            #min_samples_leaf = [ x/100 for x in range( 1, 30, 1) ],
+            min_samples_leaf  = [.004],
+            max_depth = [7],
+            n_estimators = range( 7, 10, 1)
         )
     )
     grid_randomforest.fit( X_train, y_train )
