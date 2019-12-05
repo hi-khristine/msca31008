@@ -22,11 +22,11 @@ d.drop( [ 'R_fighter', 'B_fighter' ], axis = 1, inplace = True )
 # these are months, without date so just get month and year.
 d.date = pd.to_datetime( d.date )
 for col in d.columns[ d.dtypes == 'datetime64[ns]' ]:
-    d[ col + '_year' ] = d[col].dt.year
-    d[ col + '_month' ] = d[col].dt.month
-    d[ col + '_dayofmonth' ] = d[col].dt.day
-    d[ col + '_dayofweek' ] = d[col].dt.dayofweek
-    d[ col + '_frisat' ] = np.isin( d[ col + '_dayofweek' ], [4,5] )
+    #d[ col + '_year' ] = d[col].dt.year
+    #d[ col + '_month' ] = d[col].dt.month
+    #d[ col + '_dayofmonth' ] = d[col].dt.day
+    #d[ col + '_dayofweek' ] = d[col].dt.dayofweek
+    #d[ col + '_frisat' ] = np.isin( d[ col + '_dayofweek' ], [4,5] )
     d.drop( col, axis = 1, inplace = True )
     del col
 

@@ -12,9 +12,18 @@ del f
 
 X = pd.read_csv( '../out/d1-fight-level-handle-strings-dates.csv' )
 
-# extract the Winner column.
+# calculate the winnings of calling a fight correctly.
+X['winmult'] = [1] * X.shape[0]
+if 'B_odds' in X.columns:    
+    for i in X.index[ ~X.R_odds.isna() & ~X.B_odds.isna() ]:        
+        winnerodds = X.R_odds.iloc[i] if X.Winner.iloc[i] == 1 else X.B_odds.iloc[i]
+        X['winmult'].iloc[i] = winnerodds/100 + 1 if winnerodds > 0 else -100/winnerodds + 1
+        del winnerodds, i
+
+# extract the Winner and winnings columns.
 y = X.Winner
-X.drop( 'Winner', axis = 1, inplace = True )
+winmults = X.winmult
+X.drop( [ 'Winner', 'winmult' ], axis = 1, inplace = True )
 
 # drop id column.
 X.drop( [ 'fightid' ], axis = 1, inplace = True )
@@ -39,12 +48,13 @@ else:
     nas = X.isnull().any( axis = 1 )
     X = X[ ~nas ]
     y = y[ ~nas ]
+    winmults = winmults[ ~nas ]
     del nas
 
 # normalize.
 from sklearn.preprocessing import Normalizer
 X = Normalizer().fit_transform(X)
 
-save( '../out/d2-fight-level-standardize-normalize-kmeansNA.pkl', X, y, cols )
+save( '../out/d2-fight-level-standardize-normalize-kmeansNA.pkl', X, y, cols, winmults )
 
-del X, y, cols#, labels, centroids
+del X, y, cols #, labels, centroids

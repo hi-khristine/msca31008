@@ -122,6 +122,7 @@ fight_dataset.drop( [ x for x in fight_dataset.columns if fight_dataset[x].value
 
 X = fight_dataset.reset_index( drop = True )
 y = savey.reset_index( drop = True )
+winmults = winmults.reset_index( drop = True )
 
 # standardize/normalize again.
 from sklearn.preprocessing import StandardScaler
@@ -130,7 +131,7 @@ cols = X.columns
 X = StandardScaler().fit_transform(X)
 X = Normalizer().fit_transform(X)
 
-save( '../out/d3-fight-level-transform.pkl', X, y, cols )
+save( '../out/d3-fight-level-transform.pkl', X, y, cols, winmults )
 
 del fighter_columns, stats_columns, history_columns, opp_stats_columns, B_pct_cols_fighter, \
     B_pct_cols_opp, R_pct_cols_fighter, R_pct_cols_opp, attacks, blue_fighters, blue_history_columns, \

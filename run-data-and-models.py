@@ -15,6 +15,7 @@ os.chdir( 'data-cleaning' )
 allscores = None
 kfold_splits = 10
 for iterationnum in [0,1,2,3]:
+#for iterationnum in [2,3]:
     
     # start with same random seed for each iteration.
     random.seed( 141 )
@@ -43,13 +44,14 @@ for iterationnum in [0,1,2,3]:
     X.columns = cols
     X.reset_index( drop = True, inplace = True )
     y.reset_index( drop = True, inplace = True )
+    winmults.reset_index( drop = True, inplace = True )
     print( X.shape )
     print( y.shape )
     
     # train test split.
     from sklearn.model_selection import train_test_split
-    X_train , X_test, y_train, y_test = train_test_split(
-        X, y, 
+    X_train , X_test, y_train, y_test, winmults_train, winmults_test = train_test_split(
+        X, y, winmults,
         test_size = 0.25
     )
     
@@ -59,8 +61,9 @@ for iterationnum in [0,1,2,3]:
     from sklearn.svm import SVC
     from sklearn.linear_model import LogisticRegression
     from sklearn.ensemble import VotingClassifier
-    from sklearn.metrics import confusion_matrix, classification_report, f1_score, precision_score, recall_score
+    from sklearn.metrics import confusion_matrix, classification_report, f1_score, precision_score, recall_score, accuracy_score
     from sklearn.model_selection import KFold
+    from statistics import mean 
     
     # load tuned parameters. run the applicable .py script in models/ to get these.
     if iterationnum >= 3:
@@ -68,8 +71,11 @@ for iterationnum in [0,1,2,3]:
         load( '../out/grid-randomforest.pkl' )
         load( '../out/grid-adaboost.pkl' )
         load( '../out/grid-decisiontree.pkl' )
+        load( '../out/grid-svc.pkl' )
         
         models = [
+            ('Predict Red', PredictRed() ),
+            ('Predict Higher Odds', PredictHighOdds() ),
             ('Logistic Regression', LogisticRegression( solver = 'lbfgs', n_jobs = -1 )),
             ('ADA Booster', grid_adaboost.best_estimator_ ),
             ('Decision Tree', grid_decisiontree.best_estimator_ ),
@@ -80,6 +86,8 @@ for iterationnum in [0,1,2,3]:
     else:        
     
         models = [
+            ('Predict Red', PredictRed() ),
+            ('Predict Higher Odds', PredictHighOdds() ),
             ('Logistic Regression', LogisticRegression( solver = 'lbfgs', n_jobs = -1 )),
             ('ADA Booster', AdaBoostClassifier()),
             ('Decision Tree', DecisionTreeClassifier( 
@@ -95,7 +103,7 @@ for iterationnum in [0,1,2,3]:
         ]
     
     # svc causes an error in voting classifier, so only use the first 4 models.
-    models.append( ('Voting Classifier', VotingClassifier(models[0:3]) ) )
+    models.append( ('Voting Classifier', VotingClassifier(models[2:6]) ) )
     
     # identify columns we'll drop for log regression: 
     # find highly correlated pairs.
@@ -121,6 +129,9 @@ for iterationnum in [0,1,2,3]:
     
     for modelname, model in models:
         
+        # can't run odds until ut is in the data.
+        if ( iterationnum < 2 ) and ( modelname == 'Predict Higher Odds' ): continue
+        
         print( 'Running: ' + modelname + ' / ' + iteration )
         
         idrop = todrop if modelname == 'Logistic Regression' else []
@@ -128,11 +139,16 @@ for iterationnum in [0,1,2,3]:
         # in-model (train):
         model.fit( X_train.drop( idrop, axis = 1 ), y_train )
         p = model.predict( X_train.drop( idrop, axis = 1 ) )
+        
         scores = {
             'type': ['A: Train'],
             'fscore': [f1_score( y_train, p )],
             'precision': [precision_score( y_train, p )],
-            'recall': [recall_score( y_train, p )]
+            'recall': [recall_score( y_train, p )],
+            'accuracy': [accuracy_score( y_train, p )],
+            'meanwinnings': [mean(
+                [ winmults_train[ winmults_train.index[i] ] - 1 if y_train[ y_train.index[i] ] == p[i] else -1 for i in range(len(y_train)) ]
+            )]
         }
         
         # test:
@@ -141,18 +157,27 @@ for iterationnum in [0,1,2,3]:
         scores['fscore'].append(f1_score( y_test, p ))
         scores['precision'].append(precision_score( y_test, p ))
         scores['recall'].append(recall_score( y_test, p ))
+        scores['accuracy'].append(accuracy_score( y_test, p ))
+        scores['meanwinnings'].append(mean(
+            [ winmults_test[ winmults_test.index[i] ] - 1 if y_test[ y_test.index[i] ] == p[i] else -1 for i in range(len(y_test)) ]
+        ))
         
         # cross-validation.
-        cvmets = { 'fscore': [], 'precision': [], 'recall': [] }
+        cvmets = { 'fscore': [], 'precision': [], 'recall': [], 'accuracy': [], 'meanwinnings': [] }
         for train_index, test_index in KFold( n_splits = kfold_splits, shuffle = True ).split(X.drop( idrop, axis = 1 )):
             X_train_cv, X_test_cv = X.iloc[train_index,:], X.iloc[test_index,:]
             y_train_cv, y_test_cv = y[train_index], y[test_index]
+            winmults_train_cv, winmults_test_cv = winmults[train_index], winmults[test_index]
             model.fit( X_train_cv, y_train_cv )
             p_cv = model.predict( X_test_cv )
             cvmets['fscore'].append(f1_score( y_test_cv, p_cv ))
             cvmets['precision'].append(precision_score( y_test_cv, p_cv ))
             cvmets['recall'].append(recall_score( y_test_cv, p_cv ))
-            del X_train_cv, X_test_cv, y_test_cv, y_train_cv, p_cv, train_index, test_index
+            cvmets['accuracy'].append(accuracy_score( y_test_cv, p_cv ))
+            cvmets['meanwinnings'].append(mean(
+                [ winmults_test_cv[ winmults_test_cv.index[i] ] - 1 if y_test_cv[ y_test_cv.index[i] ] == p_cv[i] else -1 for i in range(len(y_test_cv)) ]
+            ))
+            del X_train_cv, X_test_cv, y_test_cv, y_train_cv, p_cv, train_index, test_index, winmults_test_cv, winmults_train_cv
         scores['type'].append('C: Cross-Validation')
         for metricname, metricvals in cvmets.items():
             scores[ metricname ].append( np.mean( metricvals ) )
